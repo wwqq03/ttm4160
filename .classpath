@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="spotLib/multihop_common.jar"/>
+	<classpathentry kind="lib" path="spotLib/spotlib_common.jar"/>
+	<classpathentry kind="lib" path="spotLib/spotlib_device.jar"/>
+	<classpathentry kind="lib" path="spotLib/squawk_device.jar"/>
+	<classpathentry kind="lib" path="spotLib/transducer_device.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
