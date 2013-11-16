@@ -1,16 +1,12 @@
 package no.ntnu.item.ttm4160.sunspot.runtime;
 
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
-
-import runtime.IStateMachine;
-
+import java.util.*;
 
 public class Scheduler{
 
 	/* This simplified scheduler only has one single state machine */
 	private IStateMachine stm;
-	private BlockingDeque<String> inputQueue = new LinkedBlockingDeque<String>();
+	private StringQueue inputQueue = new StringQueue();
 
 	public Scheduler(IStateMachine stm) {
 		this.stm = stm;
@@ -32,7 +28,7 @@ public class Scheduler{
 					log("Terminating System... Good bye!");
 					running = false;
 				}
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}

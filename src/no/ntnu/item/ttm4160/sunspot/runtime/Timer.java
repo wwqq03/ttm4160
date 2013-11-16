@@ -16,7 +16,7 @@ public class Timer {
 	private java.util.Timer timer;
 	
 	public Timer(String timerId) {
-		this.timer = new java.util.Timer(timerId);
+		this.timer = new java.util.Timer();
 		this.timerId = timerId;
 	}
 	
