@@ -10,7 +10,9 @@ import com.sun.spot.util.Utils;
 
 public class DeviceOperator implements ILightSensorThresholdListener{
 	private ITriColorLED [] leds = EDemoBoard.getInstance().getLEDs();
-    private ILightSensor lightSensor = EDemoBoard.getInstance().getLightSensor(); 
+    private ILightSensor lightSensor = EDemoBoard.getInstance().getLightSensor();
+    private SpotFont font;
+    private int dots[];
     
     public void blinkLEDs(){
 		for (int i = 0; i < 8; i++) {
@@ -28,8 +30,37 @@ public class DeviceOperator implements ILightSensorThresholdListener{
 	}
     
     public void displayOnLEDs(int result){
+    	String displayValue = "" + result;
+    	
+    	for( int i = 0; i < displayValue.length(); i++ ){
+            displayCharacterForward( displayValue.charAt(i) );
+        }
     	
     }
+    
+    public void displayCharacterForward( char character ){
+        try {
+            dots = font.getChar(character);
+            
+            for ( int i = 0; i < dots.length; i++ ){
+                bltLEDs( dots[i] );
+                // System.out.print(character);
+                Thread.sleep(1);
+            }
+            bltLEDs(0);
+            Thread.sleep(1);
+            
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    public void bltLEDs(int ledMap){
+        for ( int i = 0; i < leds.length; i++ ) {
+            leds[i].setOn(((ledMap>>i)&1)==1);
+        }
+    }
+    
     public int doLightReading() throws IOException{
 		lightSensor.addILightSensorThresholdListener(this); // register us as a listener
         lightSensor.setThresholds(0, 700);                  // notify if no light measured or if really bright
