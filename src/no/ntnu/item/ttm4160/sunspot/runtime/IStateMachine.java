@@ -1,5 +1,7 @@
 package no.ntnu.item.ttm4160.sunspot.runtime;
 
+import no.ntnu.item.ttm4160.sunspot.communication.Message;
+
 public interface IStateMachine {
 	
 	public static final int 
@@ -7,6 +9,6 @@ public interface IStateMachine {
 		DISCARD_EVENT = 1,
 		TERMINATE_SYSTEM = 2;
 	
-	public int fire(String event, Scheduler scheduler);
+	public int fire(Object event, Scheduler scheduler);
 	
 }

@@ -2,31 +2,33 @@ package no.ntnu.item.ttm4160.sunspot.runtime;
 
 import java.util.Vector;
 
-public class StringQueue {
+import no.ntnu.item.ttm4160.sunspot.communication.Message;
+
+public class Queue {
 	
 	private Vector queue;
 	
-	public StringQueue(){
+	public Queue(){
 		queue = new Vector();
 	}
 	
-	public String take(){
+	public Object take(){
 		if(queue == null || queue.isEmpty()){
 			return null;
 		}
 		Object headElement = queue.firstElement();
 		queue.removeElementAt(0);
-		return (String)headElement;
+		return headElement;
 	}
 	
-	public void addLast(String ob){
+	public void addLast(Object ob){
 		if(queue == null){
 			return;
 		}
 		queue.addElement(ob);
 	}
 	
-	public void addFirst(String ob){
+	public void addFirst(Object ob){
 		if(queue == null){
 			return;
 		}

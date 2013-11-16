@@ -2,11 +2,13 @@ package no.ntnu.item.ttm4160.sunspot.runtime;
 
 import java.util.*;
 
+import no.ntnu.item.ttm4160.sunspot.communication.Message;
+
 public class Scheduler{
 
 	/* This simplified scheduler only has one single state machine */
 	private IStateMachine stm;
-	private StringQueue inputQueue = new StringQueue();
+	private Queue inputQueue = new Queue();
 
 	public Scheduler(IStateMachine stm) {
 		this.stm = stm;
@@ -17,7 +19,7 @@ public class Scheduler{
 		while(running) {
 			try {
 				// wait for a new event arriving in the queue
-				String event = inputQueue.take();
+				Object event = inputQueue.take();
 
 				// execute a transition
 				log("Scheduler: firing state machine with event: " + event);
@@ -38,16 +40,16 @@ public class Scheduler{
 	 * Normal events are enqueued at the end of the queue.
 	 * @param event - the name of the event
 	 */
-	void addToQueueLast(String eventId) {
-		inputQueue.addLast(eventId);
+	void addToQueueLast(Object event) {
+		inputQueue.addLast(event);
 	}
 
 	/**
 	 * Timeouts are added at the first place of the queue.
 	 * @param event - the name of the timer
 	 */
-	void addToQueueFirst(String timerId) {
-		inputQueue.addFirst(timerId);
+	void addToQueueFirst(Object timer) {
+		inputQueue.addFirst(timer);
 	}
 
 	private void log(String message) {
