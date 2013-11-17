@@ -46,7 +46,7 @@ import com.sun.spot.util.IEEEAddress;
  * The manifest specifies this class as MIDlet-1, which means it will
  * be selected for execution.
  */
-public class SunSpotApplication extends MIDlet {
+public class SunSpotApplication extends MIDlet implements ISwitchListener{
 	
 	Scheduler scheduler;
 	ISwitch button1, button2;;
@@ -60,9 +60,14 @@ public class SunSpotApplication extends MIDlet {
 	public void subscribeSpot(){
 		button1 = EDemoBoard.getInstance().getSwitches()[EDemoBoard.SW1];  
         button2 = EDemoBoard.getInstance().getSwitches()[EDemoBoard.SW2];
-        button1.addISwitchListener(listener);
-        button2.addISwitchListener(listener);
+        button1.addISwitchListener(this);
+        button2.addISwitchListener(this);
 	}
+	
+	public void switchReleased(ISwitch sw) {
+        //int switchNum = (sw == sw1) ? 1 : 2;
+        //System.out.println("Switch " + switchNum + " opened.");
+    }
 	
 	public void switchPressed(ISwitch sw) {
         int switchNum = (sw == button1) ? 1 : 2;
@@ -86,12 +91,12 @@ public class SunSpotApplication extends MIDlet {
          * Instantiate the scheduler and the state machines, then start the scheduler.
          */
         myMAC = new IEEEAddress(Spot.getInstance().getRadioPolicyManager().getIEEEAddress()).asDottedHex();
-        subscribeSpot();
         
         myDeviceOperator = new DeviceOperator();
         myCommunications = new Communications(myMAC);
         
         scheduler = new Scheduler(myMAC, myDeviceOperator, myCommunications);
+        subscribeSpot();
         scheduler.run();
     }
     
