@@ -21,7 +21,9 @@ public class Scheduler{
 		this.myDeviceOperator = myDeviceOperator;
 		this.myCommunications = myCommunications;
 		stateMachines = new Vector();
-		idGenerator = 1;
+		idGenerator = 0;
+		IStateMachine calleeStateMachine = new CalleeStateMachine(generateNewId(), myMAC, myDeviceOperator, myCommunications);
+		registerStateMachine(calleeStateMachine);
 	}
 
 	public void run() {
@@ -42,10 +44,10 @@ public class Scheduler{
 					log("Scheduler: firing state machine " + stateMachine.getId());
 					int result = stateMachine.fire(this);
 					if(result==IStateMachine.DISCARD_EVENT) {
-						log("Discarded Event: ");
+						log("Discarded Event");
 					} else if(result==IStateMachine.TERMINATE_SYSTEM) {
-						log("Terminating System... Good bye!");
-						running = false;
+						log("State Machine " + stateMachine.getId() + " is terminated!");
+						unRegisterStateMachine(stateMachine);
 					}
 					
 					i++;
@@ -56,13 +58,13 @@ public class Scheduler{
 		}
 	}
 	
-	void registerStateMachine(IStateMachine stateMachine){
+	public void registerStateMachine(IStateMachine stateMachine){
 		synchronized (stateMachines) {
 			stateMachines.addElement(stateMachine);
 		}
 	}
 	
-	void unRegisterStateMachine(IStateMachine stateMachine){
+	public void unRegisterStateMachine(IStateMachine stateMachine){
 		synchronized (stateMachines) {
 			stateMachines.removeElement(stateMachine);
 		}
@@ -90,12 +92,10 @@ public class Scheduler{
 			//Get broadcast message
 			String newId = generateNewId();
 			IStateMachine stateMachine = new CalleeStateMachine(newId, myMAC, myDeviceOperator, myCommunications);
-			synchronized (stateMachines) {
-				stateMachines.addElement(stateMachine);
-			}
+			registerStateMachine(stateMachine);
 			stateMachine.getEventQueue().addLast(msg);
 		}
-		else if(msg.getReceiverStateMachineId() != null && msg.getReceiverStateMachineId() != null){
+		else if(msg.getReceiver() != null && msg.getReceiverStateMachineId() != null){
 			for(int i = 0; i < stateMachines.size(); i++){
 				IStateMachine stateMachine = (IStateMachine)stateMachines.elementAt(i);
 				if(msg.getReceiverStateMachineId().equals(stateMachine.getId())){

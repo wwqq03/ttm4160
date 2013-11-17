@@ -57,14 +57,14 @@ public class CalleeStateMachine implements IStateMachine{
 					timeOutTimer.stop();
 					blinkLEDs();
 					state = STATE_FREE;
-					return EXECUTE_TRANSITION;
+					return TERMINATE_SYSTEM;
 				}
 				else if(msg.getContent().equals(Message.button2Pressed)){
 					timeOutTimer.stop();
 					sendReceiverDisconnect(msg);
 					blinkLEDs();
 					state = STATE_FREE;
-					return EXECUTE_TRANSITION;
+					return TERMINATE_SYSTEM;
 				}
 				else{
 					return DISCARD_EVENT;
@@ -74,7 +74,7 @@ public class CalleeStateMachine implements IStateMachine{
 				Timer timer = (Timer)event;
 				if(timer.getId().equals(TIME_OUT_TIMER)){
 					state = STATE_FREE;
-					return EXECUTE_TRANSITION;
+					return TERMINATE_SYSTEM;
 				}
 			}
 			else {
@@ -120,7 +120,7 @@ public class CalleeStateMachine implements IStateMachine{
 					}
 					else if(msg.getContent().equals(Message.Denied)){
 						state = STATE_FREE;
-						return EXECUTE_TRANSITION;
+						return TERMINATE_SYSTEM;
 					}
 					else if(msg.getContent().equals(Message.CanYouDisplayMyReadings)){
 						storeCanYouDisplayMyReadings(msg);

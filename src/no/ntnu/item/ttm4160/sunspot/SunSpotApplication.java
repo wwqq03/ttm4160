@@ -26,7 +26,9 @@ package no.ntnu.item.ttm4160.sunspot;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
+import no.ntnu.item.ttm4160.sunspot.communication.Communications;
 import no.ntnu.item.ttm4160.sunspot.communication.Message;
+import no.ntnu.item.ttm4160.sunspot.runtime.IStateMachine;
 import no.ntnu.item.ttm4160.sunspot.runtime.Scheduler;
 
 import com.sun.spot.peripheral.Spot;
@@ -50,7 +52,10 @@ public class SunSpotApplication extends MIDlet {
 	ISwitch button1, button2;;
 	EDemoBoard eDemo;
 	ISwitchListener listener;
-	String caller;
+	String myMAC;
+	DeviceOperator myDeviceOperator;
+	Communications myCommunications;
+	
 	
 	public void subscribeSpot(){
 		button1 = EDemoBoard.getInstance().getSwitches()[EDemoBoard.SW1];  
@@ -64,10 +69,10 @@ public class SunSpotApplication extends MIDlet {
         System.out.println("Switch " + switchNum + " pressed.");
         Message msg;
         if(switchNum == 1){
-        	msg = new Message(caller,Message.BROADCAST_ADDRESS,Message.button1Pressed);
+        	msg = new Message(myMAC,Message.BROADCAST_ADDRESS,Message.button1Pressed);
         	scheduler.addToQueueLast(msg);
         }else if(switchNum ==2){
-        	msg = new Message(caller,null,Message.button2Pressed);
+        	msg = new Message(myMAC,null,Message.button2Pressed);
         	scheduler.addToQueueLast(msg);
         }
     }
@@ -80,9 +85,14 @@ public class SunSpotApplication extends MIDlet {
         /*
          * Instantiate the scheduler and the state machines, then start the scheduler.
          */
-        caller = new IEEEAddress(Spot.getInstance().getRadioPolicyManager().getIEEEAddress()).asDottedHex();
+        myMAC = new IEEEAddress(Spot.getInstance().getRadioPolicyManager().getIEEEAddress()).asDottedHex();
         subscribeSpot();
         
+        myDeviceOperator = new DeviceOperator();
+        myCommunications = new Communications(myMAC);
+        
+        scheduler = new Scheduler(myMAC, myDeviceOperator, myCommunications);
+        scheduler.run();
     }
     
     
