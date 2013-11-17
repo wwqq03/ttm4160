@@ -26,9 +26,13 @@ package no.ntnu.item.ttm4160.sunspot;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
+import no.ntnu.item.ttm4160.sunspot.communication.Message;
 import no.ntnu.item.ttm4160.sunspot.runtime.Scheduler;
 
 import com.sun.spot.peripheral.Spot;
+import com.sun.spot.sensorboard.EDemoBoard;
+import com.sun.spot.sensorboard.peripheral.ISwitch;
+import com.sun.spot.sensorboard.peripheral.ISwitchListener;
 import com.sun.spot.sensorboard.peripheral.LightSensor;
 import com.sun.spot.util.BootloaderListener;
 import com.sun.spot.util.IEEEAddress;
@@ -43,7 +47,30 @@ import com.sun.spot.util.IEEEAddress;
 public class SunSpotApplication extends MIDlet {
 	
 	Scheduler scheduler;
+	ISwitch button1, button2;;
+	EDemoBoard eDemo;
+	ISwitchListener listener;
+	String caller;
 	
+	public void subscribeSpot(){
+		button1 = EDemoBoard.getInstance().getSwitches()[EDemoBoard.SW1];  
+        button2 = EDemoBoard.getInstance().getSwitches()[EDemoBoard.SW2];
+        button1.addISwitchListener(listener);
+        button2.addISwitchListener(listener);
+	}
+	
+	public void switchPressed(ISwitch sw) {
+        int switchNum = (sw == button1) ? 1 : 2;
+        System.out.println("Switch " + switchNum + " pressed.");
+        Message msg;
+        if(switchNum == 1){
+        	msg = new Message(caller,Message.BROADCAST_ADDRESS,Message.button1Pressed);
+        	scheduler.
+        }else if(switchNum ==2){
+        	msg = new Message(caller,null,Message.button2Pressed);
+        	scheduler.
+        }
+    }
 	
     protected void startApp() throws MIDletStateChangeException {
     	
@@ -53,7 +80,8 @@ public class SunSpotApplication extends MIDlet {
         /*
          * Instantiate the scheduler and the state machines, then start the scheduler.
          */
-        
+        caller = new IEEEAddress(Spot.getInstance().getRadioPolicyManager().getIEEEAddress()).asDottedHex();
+        subscribeSpot();
         
     }
     
