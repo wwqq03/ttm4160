@@ -72,6 +72,21 @@ public class Message {
 			return receiver.substring(0, index);
 		}
 	}
+	
+	public String getReceiverStateMachineId(){
+		int index=receiver.indexOf(":");
+		if(index==-1){
+			return null;
+		}
+		else{
+			if(receiver.length() > index + 1){
+				return receiver.substring(index+1);
+			}
+			else{
+				return null;
+			}
+		}
+	}
 
 	public String getContent() {
 		return content;

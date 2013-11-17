@@ -9,6 +9,12 @@ public interface IStateMachine {
 		DISCARD_EVENT = 1,
 		TERMINATE_SYSTEM = 2;
 	
-	public int fire(Object event, Scheduler scheduler);
+	public int fire(Scheduler scheduler);
+	
+	public Queue getEventQueue();
+	
+	public String getId();
+	
+	public boolean isTimerDoable(String timerId);
 	
 }
