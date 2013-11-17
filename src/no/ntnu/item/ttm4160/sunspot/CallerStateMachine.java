@@ -3,6 +3,7 @@ package no.ntnu.item.ttm4160.sunspot;
 import java.io.IOException;
 
 import no.ntnu.item.ttm4160.sunspot.runtime.IStateMachine;
+import no.ntnu.item.ttm4160.sunspot.runtime.Queue;
 import no.ntnu.item.ttm4160.sunspot.runtime.Scheduler;
 import no.ntnu.item.ttm4160.sunspot.runtime.Timer;
 import no.ntnu.item.ttm4160.sunspot.communication.Message;
@@ -17,18 +18,37 @@ public class CallerStateMachine implements IStateMachine {
 	
 	protected String state = STATES[0];
 	
-	String callee, caller;
+	private String callee, caller;
+	private String id;
+	private Queue eventQueue;
 	
 	DeviceOperator operator;
 	Communications communication;
 	
-	public CallerStateMachine(String mac, DeviceOperator operator, Communications communication) {
+	public CallerStateMachine(String id, String mac, DeviceOperator operator, Communications communication) {
+		this.id = id;
 		this.caller = mac; 
 		this.operator = operator;
 		this.communication = communication;
 	}
 	
-	public int fire(Object event, Scheduler scheduler) {
+	public String getId(){
+		return this.id;
+	}
+	
+	public Queue getEventQueue(){
+		return this.eventQueue;
+	}
+	
+	public boolean isTimerDoable(String timerId){
+		if(timerId.equals(GIVEUP_TIMER)||timerId.equals(SEND_AGAIN_TIMER)){
+			return true;
+		}
+		return false;
+	}
+	
+	public int fire(Scheduler scheduler) {
+		Object event = eventQueue.take();
 		if(state==STATES[0]) {
 			if(event instanceof Message) {
 				Message msg = (Message)event;

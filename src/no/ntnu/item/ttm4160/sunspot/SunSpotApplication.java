@@ -65,10 +65,10 @@ public class SunSpotApplication extends MIDlet {
         Message msg;
         if(switchNum == 1){
         	msg = new Message(caller,Message.BROADCAST_ADDRESS,Message.button1Pressed);
-        	scheduler.
+        	scheduler.addToQueueLast(msg);
         }else if(switchNum ==2){
         	msg = new Message(caller,null,Message.button2Pressed);
-        	scheduler.
+        	scheduler.addToQueueLast(msg);
         }
     }
 	

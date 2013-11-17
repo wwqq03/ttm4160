@@ -72,7 +72,7 @@ public class Scheduler{
 	 * Normal events are enqueued at the end of the queue.
 	 * @param event - the name of the event
 	 */
-	void addToQueueLast(Object event) {
+	public void addToQueueLast(Object event) {
 		if(! (event instanceof Message)){
 			return;
 		}
@@ -110,7 +110,7 @@ public class Scheduler{
 	 * Timeouts are added at the first place of the queue.
 	 * @param event - the name of the timer
 	 */
-	void addToQueueFirst(Object event) {
+	public void addToQueueFirst(Object event) {
 		if(! (event instanceof Timer)){
 			return;
 		}
