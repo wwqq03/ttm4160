@@ -26,7 +26,9 @@ package no.ntnu.item.ttm4160.sunspot;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
+import no.ntnu.item.ttm4160.sunspot.communication.CommunicationLayerListenerImp;
 import no.ntnu.item.ttm4160.sunspot.communication.Communications;
+import no.ntnu.item.ttm4160.sunspot.communication.ICommunicationLayerListener;
 import no.ntnu.item.ttm4160.sunspot.communication.Message;
 import no.ntnu.item.ttm4160.sunspot.runtime.IStateMachine;
 import no.ntnu.item.ttm4160.sunspot.runtime.Scheduler;
@@ -76,10 +78,12 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener{
         if(switchNum == 1){
         	msg = new Message(myMAC,Message.BROADCAST_ADDRESS,Message.button1Pressed);
         	scheduler.addToQueueLast(msg);
+        	System.out.println("add button 1 event to queue...");
         }else if(switchNum ==2){
         	msg = new Message(myMAC,null,Message.button2Pressed);
         	scheduler.addToQueueLast(msg);
         }
+        System.out.println("add button event to queue...");
     }
 	
     protected void startApp() throws MIDletStateChangeException {
@@ -96,6 +100,8 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener{
         myCommunications = new Communications(myMAC);
         
         scheduler = new Scheduler(myMAC, myDeviceOperator, myCommunications);
+        ICommunicationLayerListener communicationListener = new CommunicationLayerListenerImp(scheduler);
+        myCommunications.registerListener(communicationListener);
         subscribeSpot();
         scheduler.run();
     }

@@ -30,6 +30,7 @@ public class CallerStateMachine implements IStateMachine {
 		this.caller = mac; 
 		this.operator = operator;
 		this.communication = communication;
+		this.eventQueue = new Queue();
 	}
 	
 	public String getId(){
@@ -48,11 +49,13 @@ public class CallerStateMachine implements IStateMachine {
 	}
 	
 	public int fire(Scheduler scheduler) {
+		System.out.println("state machine operating...");
 		Object event = eventQueue.take();
-		if(state==STATES[0]) {
+		if(state.equals(STATES[0])) {
 			if(event instanceof Message) {
 				Message msg = (Message)event;
 				if(msg.getContent().equals(Message.button1Pressed)){
+					System.out.println("button 1 pressed, waiting for response...");
 					giveUpTimer.start(scheduler, 500);
 					Message send = new Message(caller,Message.BROADCAST_ADDRESS,Message.CanYouDisplayMyReadings);
 					communication.sendRemoteMessage(send);
@@ -67,7 +70,7 @@ public class CallerStateMachine implements IStateMachine {
 					return EXECUTE_TRANSITION;
 				}
 			}
-		} else if(state==STATES[1]) {
+		} else if(state.equals(STATES[1])) {
 			if(event instanceof Message) {
 				Message msg = (Message)event;
 				if(msg.getContent().equals(Message.ICanDisplayReadings)){
@@ -88,7 +91,7 @@ public class CallerStateMachine implements IStateMachine {
 					return EXECUTE_TRANSITION;
 				}
 			}
-		} else if(state==STATES[2]) {
+		} else if(state.equals(STATES[2])) {
 			if(event instanceof Timer) {
 				Timer timer = (Timer)event;
 				if(timer.getId().equals(SEND_AGAIN_TIMER)){

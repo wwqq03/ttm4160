@@ -6,6 +6,7 @@ import com.sun.spot.sensorboard.EDemoBoard;
 import com.sun.spot.sensorboard.peripheral.ILightSensor;
 import com.sun.spot.sensorboard.peripheral.ILightSensorThresholdListener;
 import com.sun.spot.sensorboard.peripheral.ITriColorLED;
+import com.sun.spot.sensorboard.peripheral.LEDColor;
 import com.sun.spot.util.Utils;
 
 public class DeviceOperator implements ILightSensorThresholdListener{
@@ -18,14 +19,14 @@ public class DeviceOperator implements ILightSensorThresholdListener{
 		for (int i = 0; i < 8; i++) {
             leds[i].setOff();
 		}
-		
+		leds[0].setColor(LEDColor.WHITE); 
 		for (int i = 0; i < 3; i++){
-			for (int j = 0; j < leds.length; j++) {
+			//for (int j = 0; j < leds.length; j++) {
 				leds[0].setOn();
-                Utils.sleep(250);
+                Utils.sleep(100);
                 leds[0].setOff();
-                Utils.sleep(750);
-			}
+                Utils.sleep(100);
+			//}
 		}
 	}
     

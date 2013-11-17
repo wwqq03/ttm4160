@@ -3,6 +3,7 @@ package no.ntnu.item.ttm4160.sunspot.runtime;
 import java.util.*;
 
 import no.ntnu.item.ttm4160.sunspot.CalleeStateMachine;
+import no.ntnu.item.ttm4160.sunspot.CallerStateMachine;
 import no.ntnu.item.ttm4160.sunspot.DeviceOperator;
 import no.ntnu.item.ttm4160.sunspot.communication.Communications;
 import no.ntnu.item.ttm4160.sunspot.communication.Message;
@@ -15,6 +16,7 @@ public class Scheduler{
 	private String myMAC;
 	private DeviceOperator myDeviceOperator;
 	private Communications myCommunications;
+	private IStateMachine callerStateMachine;
 
 	public Scheduler(String myMAC, DeviceOperator myDeviceOperator, Communications myCommunications) {
 		this.myMAC = myMAC;
@@ -22,22 +24,23 @@ public class Scheduler{
 		this.myCommunications = myCommunications;
 		stateMachines = new Vector();
 		idGenerator = 0;
-		IStateMachine calleeStateMachine = new CalleeStateMachine(generateNewId(), myMAC, myDeviceOperator, myCommunications);
-		registerStateMachine(calleeStateMachine);
+		callerStateMachine = new CallerStateMachine(generateNewId(), myMAC, myDeviceOperator, myCommunications);
+		registerStateMachine(callerStateMachine);
 	}
 
 	public void run() {
 		boolean running = true;
+		System.out.println("Starting scheduler...");
 		while(running) {
 			try {
 				int i = 0;
 				while(i < stateMachines.size()){
 					// wait for a new event arriving in the queue
 					IStateMachine stateMachine = (IStateMachine)stateMachines.elementAt(i);
-					synchronized (stateMachine.getEventQueue()) {
+					//synchronized (stateMachine.getEventQueue()) {
 						if(stateMachine.getEventQueue().isEmpty()){
 							continue;
-						}
+					//	}
 					}
 					
 					// execute a transition
@@ -79,6 +82,7 @@ public class Scheduler{
 			return;
 		}
 		Message msg = (Message)event;
+		System.out.println(msg.getContent());
 		if(msg.getReceiver() == null && msg.getContent().equals(Message.button2Pressed)){
 			//Button 2 pressed
 			for(int i = 0; i < stateMachines.size(); i++){
@@ -90,10 +94,15 @@ public class Scheduler{
 				&& msg.getReceiverMAC().equals(Message.BROADCAST_ADDRESS)
 				&& msg.getContent().equals(Message.CanYouDisplayMyReadings)){
 			//Get broadcast message
+			System.out.println("in can you bla bla");
 			String newId = generateNewId();
 			IStateMachine stateMachine = new CalleeStateMachine(newId, myMAC, myDeviceOperator, myCommunications);
 			registerStateMachine(stateMachine);
 			stateMachine.getEventQueue().addLast(msg);
+		}
+		else if(msg.getContent().equals(Message.button1Pressed)){
+			System.out.println("in button1Pressed bla bla");
+			callerStateMachine.getEventQueue().addLast(msg);
 		}
 		else if(msg.getReceiver() != null && msg.getReceiverStateMachineId() != null){
 			for(int i = 0; i < stateMachines.size(); i++){
@@ -111,11 +120,9 @@ public class Scheduler{
 	 * @param event - the name of the timer
 	 */
 	public void addToQueueFirst(Object event) {
-		if(! (event instanceof Timer)){
-			return;
-		}
+		String timerId = (String)event;
 		
-		Timer timer = (Timer)event;
+		Timer timer = new Timer(timerId);
 		for(int i = 0; i < stateMachines.size(); i++){
 			IStateMachine stateMachine = (IStateMachine)stateMachines.elementAt(i);
 			if(stateMachine.isTimerDoable(timer.getId())){

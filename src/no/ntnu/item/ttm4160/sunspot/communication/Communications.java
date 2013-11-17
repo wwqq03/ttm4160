@@ -11,6 +11,8 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.Datagram;
 import javax.microedition.io.DatagramConnection;
 
+import no.ntnu.item.ttm4160.sunspot.runtime.Scheduler;
+
 
 import com.sun.spot.io.j2me.radiogram.RadiogramConnection;
 import com.sun.spot.io.j2me.radiostream.RadiostreamConnection;
@@ -29,7 +31,6 @@ public class Communications implements ICommunicationLayer{
 	Hashtable remoteAddressBook;
 	String myMACAddress;
 	Vector listeners;
-	
 	
 	
 	public Communications(String myMACAddress) {
