@@ -57,6 +57,7 @@ public class Communications implements ICommunicationLayer{
 	 * @see no.ntnu.item.ttm4160.sunspot.ICommunication#sendRemoteMessage(no.ntnu.item.ttm4160.sunspot.Message)
 	 */
 	public void sendRemoteMessage(Message msg){
+		//System.out.println(msg.getContent());
 		try {
 			if(remoteAddressBook.containsKey(msg.getReceiverMAC())){
 				ReliableConnection rConn=(ReliableConnection)remoteAddressBook.get(msg.getReceiverMAC());
@@ -64,6 +65,7 @@ public class Communications implements ICommunicationLayer{
 			}
 			else if(msg.getReceiverMAC().equals(Message.BROADCAST_ADDRESS)){
 				sendBroadcast(msg.serializeMessage());
+				//System.out.println(msg.getReceiver());
 			}
 			else{
 				//We do not yet have a reliable connection to this receiver

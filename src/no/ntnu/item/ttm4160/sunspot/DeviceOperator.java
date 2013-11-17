@@ -12,7 +12,7 @@ import com.sun.spot.util.Utils;
 public class DeviceOperator implements ILightSensorThresholdListener{
 	private ITriColorLED [] leds = EDemoBoard.getInstance().getLEDs();
     private ILightSensor lightSensor = EDemoBoard.getInstance().getLightSensor();
-    private SpotFont font;
+    private SpotFont font = new SpotFont();
     private int dots[];
     
     public void blinkLEDs(){
@@ -31,8 +31,7 @@ public class DeviceOperator implements ILightSensorThresholdListener{
 	}
     
     public void displayOnLEDs(int result){
-    	String displayValue = "" + result;
-    	
+    	String displayValue = String.valueOf(result);
     	for( int i = 0; i < displayValue.length(); i++ ){
             displayCharacterForward( displayValue.charAt(i) );
         }
@@ -58,6 +57,7 @@ public class DeviceOperator implements ILightSensorThresholdListener{
     
     public void bltLEDs(int ledMap){
         for ( int i = 0; i < leds.length; i++ ) {
+        	leds[i].setColor(LEDColor.WHITE);
             leds[i].setOn(((ledMap>>i)&1)==1);
         }
     }

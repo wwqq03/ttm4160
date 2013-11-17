@@ -83,7 +83,6 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener{
         	msg = new Message(myMAC,null,Message.button2Pressed);
         	scheduler.addToQueueLast(msg);
         }
-        System.out.println("add button event to queue...");
     }
 	
     protected void startApp() throws MIDletStateChangeException {

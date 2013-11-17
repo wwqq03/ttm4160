@@ -49,7 +49,7 @@ public class CallerStateMachine implements IStateMachine {
 	}
 	
 	public int fire(Scheduler scheduler) {
-		System.out.println("state machine operating...");
+		System.out.println("callereeeeeeeeeeee: " + state);
 		Object event = eventQueue.take();
 		if(state.equals(STATES[0])) {
 			if(event instanceof Message) {
@@ -57,14 +57,14 @@ public class CallerStateMachine implements IStateMachine {
 				if(msg.getContent().equals(Message.button1Pressed)){
 					System.out.println("button 1 pressed, waiting for response...");
 					giveUpTimer.start(scheduler, 500);
-					Message send = new Message(caller,Message.BROADCAST_ADDRESS,Message.CanYouDisplayMyReadings);
+					Message send = new Message(caller + ":" + id,Message.BROADCAST_ADDRESS,Message.CanYouDisplayMyReadings);
 					communication.sendRemoteMessage(send);
 					state = STATES[1];
 					System.out.println("broadcast sent...");
 					return EXECUTE_TRANSITION;
 				} else if(msg.getContent().equals(Message.ICanDisplayReadings)){
 					callee = msg.getSender();
-					Message send = new Message(caller,callee,Message.Denied);
+					Message send = new Message(caller + ":" + id,callee,Message.Denied);
 					communication.sendRemoteMessage(send);
 					System.out.println("request denied...");
 					return EXECUTE_TRANSITION;
@@ -74,8 +74,9 @@ public class CallerStateMachine implements IStateMachine {
 			if(event instanceof Message) {
 				Message msg = (Message)event;
 				if(msg.getContent().equals(Message.ICanDisplayReadings)){
+					System.out.println("approving...");
 					callee = msg.getSender();
-					Message send = new Message(caller,callee,Message.Approved);
+					Message send = new Message(caller + ":" + id,callee,Message.Approved);
 					communication.sendRemoteMessage(send);
 					sendAgainTimer.start(scheduler, 100);
 					state = STATES[2];
@@ -99,7 +100,7 @@ public class CallerStateMachine implements IStateMachine {
 					int result;
 					try {
 						result = operator.doLightReading();
-						Message msg = new Message(caller, callee, Message.Reading+result);
+						Message msg = new Message(caller + ":" + id, callee, Message.Reading+result);
 						communication.sendRemoteMessage(msg);
 						System.out.println("reading sent...");
 					} catch (IOException e) {
@@ -110,8 +111,9 @@ public class CallerStateMachine implements IStateMachine {
 			} else if(event instanceof Message) {
 				Message msg = (Message)event;
 				if(msg.getContent().equals(Message.button2Pressed)){
-					Message send = new Message(caller,callee,Message.SenderDisconnect);
+					Message send = new Message(caller + ":" + id,callee,Message.SenderDisconnect);
 					communication.sendRemoteMessage(send);
+					sendAgainTimer.stop();
 					operator.blinkLEDs();
 					state = STATES[0];
 					System.out.println("sender disconnects...");
@@ -123,7 +125,7 @@ public class CallerStateMachine implements IStateMachine {
 					System.out.println("receiver disconnects...");
 					return EXECUTE_TRANSITION;
 				} else if(msg.getContent().equals(Message.ICanDisplayReadings)) {
-					Message send = new Message(caller,callee,Message.Denied);
+					Message send = new Message(caller + ":" + id,callee,Message.Denied);
 					communication.sendRemoteMessage(send);
 					System.out.println("request denied...");
 					return EXECUTE_TRANSITION;

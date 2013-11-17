@@ -41,15 +41,16 @@ public class CalleeStateMachine implements IStateMachine{
 	
 	public int fire(Scheduler scheduler){
 		Object event = eventQueue.take();
-		
+		System.out.println("callee: " + state);
 		if(state.equals(STATE_BUSY)){
 			//busy state
 			if(event instanceof Message){
 				Message msg = (Message)event;
-				if(msg.getContent().equals(Message.Reading)){
+				if(msg.getContent().startsWith(Message.Reading)){
 					String reading = msg.getContent().substring(8);
 					displayOnLEDS(reading);
-					timeOutTimer.restart();
+					timeOutTimer.stop();
+					timeOutTimer.start(scheduler, 5000);
 					state = STATE_BUSY;
 					return EXECUTE_TRANSITION;
 				}
@@ -149,13 +150,13 @@ public class CalleeStateMachine implements IStateMachine{
 
 	private void sendICanDisplayReadings(Message msg) {
 		// TODO Auto-generated method stub
-		Message newMsg = new Message(myMAC + id, caller, Message.ICanDisplayReadings);
+		Message newMsg = new Message(myMAC + ":" + id, caller, Message.ICanDisplayReadings);
 		communications.sendRemoteMessage(newMsg);
 	}
 
 	private void sendReceiverDisconnect(Message msg) {
 		// TODO Auto-generated method stub
-		Message newMsg = new Message(myMAC + id, caller, Message.ReceiverDisconnect);
+		Message newMsg = new Message(myMAC + ":" + id, caller, Message.ReceiverDisconnect);
 		communications.sendRemoteMessage(newMsg);
 	}
 

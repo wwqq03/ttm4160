@@ -33,14 +33,11 @@ public class Scheduler{
 		System.out.println("Starting scheduler...");
 		while(running) {
 			try {
-				int i = 0;
-				while(i < stateMachines.size()){
+				for(int i = 0; i < stateMachines.size(); i++){
 					// wait for a new event arriving in the queue
 					IStateMachine stateMachine = (IStateMachine)stateMachines.elementAt(i);
-					//synchronized (stateMachine.getEventQueue()) {
-						if(stateMachine.getEventQueue().isEmpty()){
-							continue;
-					//	}
+					if(stateMachine.getEventQueue().isEmpty()){
+						continue;
 					}
 					
 					// execute a transition
@@ -52,8 +49,6 @@ public class Scheduler{
 						log("State Machine " + stateMachine.getId() + " is terminated!");
 						unRegisterStateMachine(stateMachine);
 					}
-					
-					i++;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -62,15 +57,12 @@ public class Scheduler{
 	}
 	
 	public void registerStateMachine(IStateMachine stateMachine){
-		synchronized (stateMachines) {
 			stateMachines.addElement(stateMachine);
-		}
+			System.out.println("state machine registered " + stateMachine.getId());
 	}
 	
 	public void unRegisterStateMachine(IStateMachine stateMachine){
-		synchronized (stateMachines) {
 			stateMachines.removeElement(stateMachine);
-		}
 	}
 
 	/**
@@ -82,7 +74,6 @@ public class Scheduler{
 			return;
 		}
 		Message msg = (Message)event;
-		System.out.println(msg.getContent());
 		if(msg.getReceiver() == null && msg.getContent().equals(Message.button2Pressed)){
 			//Button 2 pressed
 			for(int i = 0; i < stateMachines.size(); i++){
@@ -94,14 +85,12 @@ public class Scheduler{
 				&& msg.getReceiverMAC().equals(Message.BROADCAST_ADDRESS)
 				&& msg.getContent().equals(Message.CanYouDisplayMyReadings)){
 			//Get broadcast message
-			System.out.println("in can you bla bla");
 			String newId = generateNewId();
 			IStateMachine stateMachine = new CalleeStateMachine(newId, myMAC, myDeviceOperator, myCommunications);
 			registerStateMachine(stateMachine);
 			stateMachine.getEventQueue().addLast(msg);
 		}
 		else if(msg.getContent().equals(Message.button1Pressed)){
-			System.out.println("in button1Pressed bla bla");
 			callerStateMachine.getEventQueue().addLast(msg);
 		}
 		else if(msg.getReceiver() != null && msg.getReceiverStateMachineId() != null){
