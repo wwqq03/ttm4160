@@ -37,11 +37,13 @@ public class CallerStateMachine implements IStateMachine {
 					Message send = new Message(caller,Message.BROADCAST_ADDRESS,Message.CanYouDisplayMyReadings);
 					communication.sendRemoteMessage(send);
 					state = STATES[1];
+					System.out.println("broadcast sent...");
 					return EXECUTE_TRANSITION;
 				} else if(msg.getContent().equals(Message.ICanDisplayReadings)){
 					callee = msg.getSender();
-					Message send = new Message(caller,Message.BROADCAST_ADDRESS,Message.CanYouDisplayMyReadings);
+					Message send = new Message(caller,callee,Message.Denied);
 					communication.sendRemoteMessage(send);
+					System.out.println("request denied...");
 					return EXECUTE_TRANSITION;
 				}
 			}
@@ -49,11 +51,12 @@ public class CallerStateMachine implements IStateMachine {
 			if(event instanceof Message) {
 				Message msg = (Message)event;
 				if(msg.getContent().equals(Message.ICanDisplayReadings)){
-					callee = msg.getSenderMAC();
-					Message send = new Message(caller,callee,Message.ICanDisplayReadings);
+					callee = msg.getSender();
+					Message send = new Message(caller,callee,Message.Approved);
 					communication.sendRemoteMessage(send);
 					sendAgainTimer.start(scheduler, 100);
 					state = STATES[2];
+					System.out.println("approve and start sending...");
 					return EXECUTE_TRANSITION;
 				}
 			} else if(event instanceof Timer){
@@ -61,6 +64,7 @@ public class CallerStateMachine implements IStateMachine {
 				if(timer.getId().equals(GIVEUP_TIMER)){
 					operator.blinkLEDs();
 					state = STATES[0];
+					System.out.println("give up timer expires...");
 					return EXECUTE_TRANSITION;
 				}
 			}
@@ -74,6 +78,7 @@ public class CallerStateMachine implements IStateMachine {
 						result = operator.doLightReading();
 						Message msg = new Message(caller, callee, Message.Reading+result);
 						communication.sendRemoteMessage(msg);
+						System.out.println("reading sent...");
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -86,15 +91,18 @@ public class CallerStateMachine implements IStateMachine {
 					communication.sendRemoteMessage(send);
 					operator.blinkLEDs();
 					state = STATES[0];
+					System.out.println("sender disconnects...");
 					return EXECUTE_TRANSITION;
 				} else if(msg.getContent().equals(Message.ReceiverDisconnect)) {
 					sendAgainTimer.stop();
 					operator.blinkLEDs();
 					state = STATES[0];
+					System.out.println("receiver disconnects...");
 					return EXECUTE_TRANSITION;
 				} else if(msg.getContent().equals(Message.ICanDisplayReadings)) {
 					Message send = new Message(caller,callee,Message.Denied);
 					communication.sendRemoteMessage(send);
+					System.out.println("request denied...");
 					return EXECUTE_TRANSITION;
 				}
 			}
