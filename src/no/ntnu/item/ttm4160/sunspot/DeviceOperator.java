@@ -12,8 +12,6 @@ import com.sun.spot.util.Utils;
 public class DeviceOperator implements ILightSensorThresholdListener{
 	private ITriColorLED [] leds = EDemoBoard.getInstance().getLEDs();
     private ILightSensor lightSensor = EDemoBoard.getInstance().getLightSensor();
-    private SpotFont font = new SpotFont();
-    private int dots[];
     
     public void blinkLEDs(){
 		for (int i = 0; i < 8; i++) {
@@ -31,35 +29,54 @@ public class DeviceOperator implements ILightSensorThresholdListener{
 	}
     
     public void displayOnLEDs(int result){
-    	String displayValue = String.valueOf(result);
-    	for( int i = 0; i < displayValue.length(); i++ ){
-            displayCharacterForward( displayValue.charAt(i) );
-        }
-    	
-    }
-    
-    public void displayCharacterForward( char character ){
-        try {
-            dots = font.getChar(character);
-            
-            for ( int i = 0; i < dots.length; i++ ){
-                bltLEDs( dots[i] );
-                // System.out.print(character);
-                Thread.sleep(1);
-            }
-            bltLEDs(0);
-            Thread.sleep(1);
-            
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
-    }
-    
-    public void bltLEDs(int ledMap){
-        for ( int i = 0; i < leds.length; i++ ) {
-        	leds[i].setColor(LEDColor.WHITE);
-            leds[i].setOn(((ledMap>>i)&1)==1);
-        }
+    	for (int i = 0; i < 8; i++) {
+            leds[i].setOff();
+		}
+    	if(result >= 0 && result < 94){
+    		leds[0].setOn();
+    	} else if(result >= 94 && result < 188){
+    		leds[0].setOn();
+    		leds[1].setOn();
+    	} else if(result >= 188 && result < 282){
+    		leds[0].setOn();
+    		leds[1].setOn();
+    		leds[2].setOn();
+    	} else if(result >= 282 && result < 376){
+    		leds[0].setOn();
+    		leds[1].setOn();
+    		leds[2].setOn();
+    		leds[3].setOn();
+    	} else if(result >= 376 && result < 470){
+    		leds[0].setOn();
+    		leds[1].setOn();
+    		leds[2].setOn();
+    		leds[3].setOn();
+    		leds[4].setOn();
+    	} else if(result >= 470 && result < 564){
+    		leds[0].setOn();
+    		leds[1].setOn();
+    		leds[2].setOn();
+    		leds[3].setOn();
+    		leds[4].setOn();
+    		leds[5].setOn();
+    	} else if(result >= 564 && result < 658){
+    		leds[0].setOn();
+    		leds[1].setOn();
+    		leds[2].setOn();
+    		leds[3].setOn();
+    		leds[4].setOn();
+    		leds[5].setOn();
+    		leds[6].setOn();
+    	} else if(result >= 658 && result < 751){
+    		leds[0].setOn();
+    		leds[1].setOn();
+    		leds[2].setOn();
+    		leds[3].setOn();
+    		leds[4].setOn();
+    		leds[5].setOn();
+    		leds[6].setOn();
+    		leds[7].setOn();
+    	}
     }
     
     public int doLightReading() throws IOException{
