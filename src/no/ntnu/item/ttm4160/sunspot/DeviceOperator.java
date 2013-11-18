@@ -19,7 +19,7 @@ public class DeviceOperator implements ILightSensorThresholdListener{
 		for (int i = 0; i < 8; i++) {
             leds[i].setOff();
 		}
-		leds[0].setColor(LEDColor.WHITE); 
+		leds[0].setColor(LEDColor.RED); 
 		for (int i = 0; i < 3; i++){
 			//for (int j = 0; j < leds.length; j++) {
 				leds[0].setOn();

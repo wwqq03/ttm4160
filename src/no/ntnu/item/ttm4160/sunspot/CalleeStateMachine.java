@@ -41,7 +41,6 @@ public class CalleeStateMachine implements IStateMachine{
 	
 	public int fire(Scheduler scheduler){
 		Object event = eventQueue.take();
-		System.out.println("callee: " + state);
 		if(state.equals(STATE_BUSY)){
 			//busy state
 			if(event instanceof Message){
@@ -52,12 +51,14 @@ public class CalleeStateMachine implements IStateMachine{
 					timeOutTimer.stop();
 					timeOutTimer.start(scheduler, 5000);
 					state = STATE_BUSY;
+					System.out.println("calleeeeeeeeeeeeeeeeeee: " + state);
 					return EXECUTE_TRANSITION;
 				}
 				else if(msg.getContent().equals(Message.SenderDisconnect)){
 					timeOutTimer.stop();
 					blinkLEDs();
 					state = STATE_FREE;
+					System.out.println("calleeeeeeeeeeeeeeeeeee: " + state);
 					return TERMINATE_SYSTEM;
 				}
 				else if(msg.getContent().equals(Message.button2Pressed)){
@@ -65,6 +66,7 @@ public class CalleeStateMachine implements IStateMachine{
 					sendReceiverDisconnect(msg);
 					blinkLEDs();
 					state = STATE_FREE;
+					System.out.println("calleeeeeeeeeeeeeeeeeee: " + state);
 					return TERMINATE_SYSTEM;
 				}
 				else{
@@ -75,6 +77,7 @@ public class CalleeStateMachine implements IStateMachine{
 				Timer timer = (Timer)event;
 				if(timer.getId().equals(TIME_OUT_TIMER)){
 					state = STATE_FREE;
+					System.out.println("calleeeeeeeeeeeeeeeeeee: " + state);
 					return TERMINATE_SYSTEM;
 				}
 			}
@@ -88,6 +91,7 @@ public class CalleeStateMachine implements IStateMachine{
 				Message msg = (Message)event;
 				if(msg.getContent().equals(Message.Reading)){
 					sendReceiverDisconnect(msg);
+					System.out.println("calleeeeeeeeeeeeeeeeeee: " + state);
 					return EXECUTE_TRANSITION;
 				}
 			}
@@ -100,6 +104,7 @@ public class CalleeStateMachine implements IStateMachine{
 						caller = msg.getSender();
 						sendICanDisplayReadings(msg);
 						state = STATE_WAIT_APPROVED;
+						System.out.println("calleeeeeeeeeeeeeeeeeee: " + state);
 						return EXECUTE_TRANSITION;
 					}
 					else{
@@ -117,14 +122,17 @@ public class CalleeStateMachine implements IStateMachine{
 					if(msg.getContent().equals(Message.Approved)){
 						timeOutTimer.start(scheduler, 5000);
 						state = STATE_BUSY;
+						System.out.println("calleeeeeeeeeeeeeeeeeee: " + state);
 						return EXECUTE_TRANSITION;
 					}
 					else if(msg.getContent().equals(Message.Denied)){
 						state = STATE_FREE;
+						System.out.println("calleeeeeeeeeeeeeeeeeee: " + state);
 						return TERMINATE_SYSTEM;
 					}
 					else if(msg.getContent().equals(Message.CanYouDisplayMyReadings)){
 						storeCanYouDisplayMyReadings(msg);
+						System.out.println("calleeeeeeeeeeeeeeeeeee: " + state);
 						return EXECUTE_TRANSITION;
 					}
 					else{
