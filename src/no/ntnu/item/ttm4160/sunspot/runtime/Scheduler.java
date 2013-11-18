@@ -1,11 +1,6 @@
 package no.ntnu.item.ttm4160.sunspot.runtime;
 
 import java.util.*;
-
-import no.ntnu.item.ttm4160.sunspot.CalleeStateMachine;
-import no.ntnu.item.ttm4160.sunspot.CallerStateMachine;
-import no.ntnu.item.ttm4160.sunspot.DeviceOperator;
-import no.ntnu.item.ttm4160.sunspot.communication.Communications;
 import no.ntnu.item.ttm4160.sunspot.communication.Message;
 
 public class Scheduler{
@@ -13,19 +8,10 @@ public class Scheduler{
 	/* This simplified scheduler only has one single state machine */
 	private Vector stateMachines;
 	private int idGenerator;
-	private String myMAC;
-	private DeviceOperator myDeviceOperator;
-	private Communications myCommunications;
-	private IStateMachine callerStateMachine;
 
-	public Scheduler(String myMAC, DeviceOperator myDeviceOperator, Communications myCommunications) {
-		this.myMAC = myMAC;
-		this.myDeviceOperator = myDeviceOperator;
-		this.myCommunications = myCommunications;
+	public Scheduler() {
 		stateMachines = new Vector();
 		idGenerator = 0;
-		callerStateMachine = new CallerStateMachine(generateNewId(), myMAC, myDeviceOperator, myCommunications);
-		registerStateMachine(callerStateMachine);
 	}
 
 	public void run() {
@@ -75,7 +61,7 @@ public class Scheduler{
 		}
 		Message msg = (Message)event;
 		if(msg.getReceiver() == null && msg.getContent().equals(Message.button2Pressed)){
-			//Button 2 pressed
+			//Button 2 pressed, kind of broadcast locally
 			for(int i = 0; i < stateMachines.size(); i++){
 				IStateMachine stateMachine = (IStateMachine)stateMachines.elementAt(i);
 				stateMachine.getEventQueue().addLast(msg);
@@ -84,16 +70,23 @@ public class Scheduler{
 		else if(msg.getReceiverMAC() != null 
 				&& msg.getReceiverMAC().equals(Message.BROADCAST_ADDRESS)
 				&& msg.getContent().equals(Message.CanYouDisplayMyReadings)){
-			//Get broadcast message
-			String newId = generateNewId();
-			IStateMachine stateMachine = new CalleeStateMachine(newId, myMAC, myDeviceOperator, myCommunications);
-			registerStateMachine(stateMachine);
-			stateMachine.getEventQueue().addLast(msg);
+			//broadcast message
+			for(int i = 0; i < stateMachines.size(); i++){
+				IStateMachine stateMachine = (IStateMachine)stateMachines.elementAt(i);
+				if(stateMachine.wishToReceiveBroadcast()){
+					stateMachine.getEventQueue().addLast(msg);
+				}
+			}
 		}
 		else if(msg.getContent().equals(Message.button1Pressed)){
-			callerStateMachine.getEventQueue().addLast(msg);
+			//button 1 pressed, kind of broadcast locally
+			for(int i = 0; i < stateMachines.size(); i++){
+				IStateMachine stateMachine = (IStateMachine)stateMachines.elementAt(i);
+				stateMachine.getEventQueue().addLast(msg);
+			}
 		}
 		else if(msg.getReceiver() != null && msg.getReceiverStateMachineId() != null){
+			//normal messages
 			for(int i = 0; i < stateMachines.size(); i++){
 				IStateMachine stateMachine = (IStateMachine)stateMachines.elementAt(i);
 				if(msg.getReceiverStateMachineId().equals(stateMachine.getId())){

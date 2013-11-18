@@ -17,4 +17,6 @@ public interface IStateMachine {
 	
 	public boolean isTimerDoable(String timerId);
 	
+	public boolean wishToReceiveBroadcast();
+	
 }

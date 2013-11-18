@@ -57,6 +57,7 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener{
 	String myMAC;
 	DeviceOperator myDeviceOperator;
 	Communications myCommunications;
+	private int idGenerator = 0;
 	
 	
 	public void subscribeSpot(){
@@ -98,7 +99,25 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener{
         myDeviceOperator = new DeviceOperator();
         myCommunications = new Communications(myMAC);
         
-        scheduler = new Scheduler(myMAC, myDeviceOperator, myCommunications);
+        scheduler = new Scheduler();
+        scheduler.registerStateMachine(
+        		new CallerStateMachine(
+        				generateNewStateMachineId(),
+        				myMAC,
+        				myDeviceOperator,
+        				myCommunications,
+        				false
+        		)
+        );
+        scheduler.registerStateMachine(
+        		new CalleeStateMachine(
+        				generateNewStateMachineId(),
+        				myMAC,
+        				myDeviceOperator,
+        				myCommunications,
+        				true
+        		)
+        );
         ICommunicationLayerListener communicationListener = new CommunicationLayerListenerImp(scheduler);
         myCommunications.registerListener(communicationListener);
         subscribeSpot();
@@ -131,6 +150,12 @@ public class SunSpotApplication extends MIDlet implements ISwitchListener{
     protected void destroyApp(boolean unconditional) throws MIDletStateChangeException {
     	
     	
+    }
+    
+    
+    private String generateNewStateMachineId(){
+    	idGenerator ++;
+    	return String.valueOf(idGenerator);
     }
 
     

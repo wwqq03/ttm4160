@@ -36,11 +36,21 @@ public class Message {
 	private final String sender;
 	private final String receiver;
 	private final String content;
+	private boolean isReserved;
 	
 	public Message(String sender, String receiver, String content) {
 		this.sender=sender;
 		this.receiver=receiver;
 		this.content=content;
+		this.isReserved=false;
+	}
+	
+	public void setAsReserved(){
+		this.isReserved = true;
+	}
+	
+	public boolean isReserved(){
+		return isReserved;
 	}
 
 	public String getSender() {

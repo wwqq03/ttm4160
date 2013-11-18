@@ -22,13 +22,15 @@ public class CalleeStateMachine implements IStateMachine{
 	private Communications communications;
 	private Queue eventQueue;
 	private String id;
+	private boolean wishToReceiveBroadcast = true;
 	
-	public CalleeStateMachine(String id, String myMAC, DeviceOperator device, Communications communications){
+	public CalleeStateMachine(String id, String myMAC, DeviceOperator device, Communications communications, boolean wishToReceiveBroadcast){
 		this.id = id;
 		this.myMAC = myMAC;
 		this.deviceOperator = device;
 		this.communications = communications;
 		eventQueue = new Queue();
+		this.wishToReceiveBroadcast = wishToReceiveBroadcast;
 	}
 
 	public Queue getEventQueue(){
@@ -40,7 +42,21 @@ public class CalleeStateMachine implements IStateMachine{
 	}
 	
 	public int fire(Scheduler scheduler){
-		Object event = eventQueue.take();
+		if(eventQueue.isEmpty()){
+			return DISCARD_EVENT;
+		}
+		Object event;
+		if(state.equals(STATE_FREE)){
+			//If it is free state, just take the first event in the queue
+			event = eventQueue.take();
+		}
+		else{
+			//If it is not free state, take the first non-reserved event
+			//reserved event is "CanyouDisplayMyReadings" message
+			event = takeNonReservedEvent();
+		}
+		
+		
 		if(state.equals(STATE_BUSY)){
 			//busy state
 			if(event instanceof Message){
@@ -59,7 +75,7 @@ public class CalleeStateMachine implements IStateMachine{
 					blinkLEDs();
 					state = STATE_FREE;
 					System.out.println("calleeeeeeeeeeeeeeeeeee: " + state);
-					return TERMINATE_SYSTEM;
+					return EXECUTE_TRANSITION;
 				}
 				else if(msg.getContent().equals(Message.button2Pressed)){
 					timeOutTimer.stop();
@@ -67,7 +83,7 @@ public class CalleeStateMachine implements IStateMachine{
 					blinkLEDs();
 					state = STATE_FREE;
 					System.out.println("calleeeeeeeeeeeeeeeeeee: " + state);
-					return TERMINATE_SYSTEM;
+					return EXECUTE_TRANSITION;
 				}
 				else{
 					return DISCARD_EVENT;
@@ -78,7 +94,7 @@ public class CalleeStateMachine implements IStateMachine{
 				if(timer.getId().equals(TIME_OUT_TIMER)){
 					state = STATE_FREE;
 					System.out.println("calleeeeeeeeeeeeeeeeeee: " + state);
-					return TERMINATE_SYSTEM;
+					return EXECUTE_TRANSITION;
 				}
 			}
 			else {
@@ -128,7 +144,7 @@ public class CalleeStateMachine implements IStateMachine{
 					else if(msg.getContent().equals(Message.Denied)){
 						state = STATE_FREE;
 						System.out.println("calleeeeeeeeeeeeeeeeeee: " + state);
-						return TERMINATE_SYSTEM;
+						return EXECUTE_TRANSITION;
 					}
 					else if(msg.getContent().equals(Message.CanYouDisplayMyReadings)){
 						storeCanYouDisplayMyReadings(msg);
@@ -147,12 +163,48 @@ public class CalleeStateMachine implements IStateMachine{
 		return DISCARD_EVENT;
 	}
 	
+	private Object takeNonReservedEvent() {
+		// TODO Auto-generated method stub
+		if (eventQueue.isEmpty()){
+			return null;
+		}
+		
+		for(int i = 0; i < eventQueue.size(); i++){
+			Object event = eventQueue.getElementAt(i);
+			if(event instanceof Timer){
+				return eventQueue.takeElementAt(i);
+			}
+			else if(event instanceof Message){
+				Message msg = (Message)event;
+				if(msg.isReserved()){
+					continue;
+				}
+				else{
+					return eventQueue.takeElementAt(i);
+				}
+			}
+			else{
+				return null;
+			}
+		}
+		return null;
+	}
+
 	public boolean isTimerDoable(String timerId){
 		return timerId.equals(TIME_OUT_TIMER);
+	}
+	
+	public boolean wishToReceiveBroadcast(){
+		return wishToReceiveBroadcast;
+	}
+	
+	public void setWishToReceiveBroadcast(boolean wish){
+		wishToReceiveBroadcast = wish;
 	}
 
 	private void storeCanYouDisplayMyReadings(Message msg) {
 		// TODO Auto-generated method stub
+		msg.setAsReserved();
 		eventQueue.addFirst(msg);
 	}
 

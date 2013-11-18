@@ -21,6 +21,22 @@ public class Queue {
 		return headElement;
 	}
 	
+	public Object takeElementAt(int index){
+		if(queue == null || queue.isEmpty()){
+			return null;
+		}
+		Object element = queue.elementAt(index);
+		queue.removeElementAt(index);
+		return element;
+	}
+	
+	public Object getElementAt(int index){
+		if(index > queue.size()){
+			return null;
+		}
+		return queue.elementAt(index);
+	}
+	
 	public void addLast(Object ob){
 		if(queue == null){
 			return;
@@ -40,6 +56,10 @@ public class Queue {
 			return true;
 		}
 		return queue.isEmpty();
+	}
+	
+	public int size(){
+		return queue.size();
 	}
 
 }

@@ -24,13 +24,15 @@ public class CallerStateMachine implements IStateMachine {
 	
 	DeviceOperator operator;
 	Communications communication;
+	private boolean wishToReceiveBroadcast;
 	
-	public CallerStateMachine(String id, String mac, DeviceOperator operator, Communications communication) {
+	public CallerStateMachine(String id, String mac, DeviceOperator operator, Communications communication, boolean wishToReceiveBroadcast) {
 		this.id = id;
 		this.caller = mac; 
 		this.operator = operator;
 		this.communication = communication;
 		this.eventQueue = new Queue();
+		this.wishToReceiveBroadcast = wishToReceiveBroadcast;
 	}
 	
 	public String getId(){
@@ -46,6 +48,14 @@ public class CallerStateMachine implements IStateMachine {
 			return true;
 		}
 		return false;
+	}
+	
+	public boolean wishToReceiveBroadcast(){
+		return wishToReceiveBroadcast;
+	}
+	
+	public void setWishToReceiveBroadcast(boolean wish){
+		wishToReceiveBroadcast = wish;
 	}
 	
 	public int fire(Scheduler scheduler) {
