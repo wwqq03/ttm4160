@@ -31,6 +31,7 @@ public class DeviceOperator implements ILightSensorThresholdListener{
     public void displayOnLEDs(int result){
     	for (int i = 0; i < 8; i++) {
             leds[i].setOff();
+            leds[i].setColor(LEDColor.GREEN);
 		}
     	if(result >= 0 && result < 94){
     		leds[0].setOn();
